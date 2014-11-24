@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Cammino_Mailchimp>
+			<version>0.1.0</version>
+		</Cammino_Mailchimp>
+	</modules>
+	<global>
+
+		<events>
+			<newsletter_subscriber_save_commit_after>
+				<observers>
+					<subscriber_observer>
+						<type>singleton</type>
+						<class>Cammino_Mailchimp_Model_SubscriberObserver</class>
+						<method>sync</method>
+					</subscriber_observer>
+				</observers>
+			</newsletter_subscriber_save_commit_after>
+		</events>
+
+	</global>
+</config>
