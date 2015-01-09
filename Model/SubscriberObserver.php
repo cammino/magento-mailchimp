@@ -30,21 +30,25 @@ class Cammino_Mailchimp_Model_SubscriberObserver extends Varien_Object
                 $groupIdParam = Mage::getStoreConfig("newsletter/mailchimp/group_id_param");
                 $interestGroupParam = Mage::getStoreConfig("newsletter/mailchimp/interest_group_param");
 
+                $defaultGroupId = Mage::getStoreConfig("newsletter/mailchimp/default_group_id");
+                $defaultInterestGroup = Mage::getStoreConfig("newsletter/mailchimp/default_interest_group");
+
                 $email = $subscriber->getEmail();
                 $name = isset($params[$nameParam]) ? $params[$nameParam] : "";
-                $groupId = isset($params[$groupIdParam]) ? $params[$groupIdParam] : "";
-                $interestGroup = isset($params[$interestGroupParam]) ? $params[$interestGroupParam] : "";
-
+                
+                $groupId = isset($params[$groupIdParam]) ? $params[$groupIdParam] : $defaultGroupId;
+                $interestGroup = isset($params[$interestGroupParam]) ? $params[$interestGroupParam] : $defaultInterestGroup;
+                
                 $mailchimp = new MailChimp($token);
                 $mailchimp->set_timeout(3);
 
                 if (!empty($nameMergeVar) && !empty($name))
                     $mergeVars[$nameMergeVar] = $name;
 
-                if (!empty($groupIdParam) && !empty($groupId))
+                if (!empty($groupId))
                     $mergeVars["GROUPINGS"] = array(array( 'id' => $groupId ));
 
-                if (!empty($interestGroupParam) && !empty($interestGroup) && isset($mergeVars["GROUPINGS"]))
+                if (!empty($interestGroup) && isset($mergeVars["GROUPINGS"]))
                     $mergeVars["GROUPINGS"][0]["groups"] = array($interestGroup);
 
                 $request = array(
