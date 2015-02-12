@@ -6,18 +6,52 @@
 		</Cammino_Mailchimp>
 	</modules>
 	<global>
+		<blocks>
+			<mailchimp>
+				<class>Cammino_Mailchimp_Block</class>
+			</mailchimp>
+		</blocks>
+		
+		<models>
+			<mailchimp>
+				<class>Cammino_Mailchimp_Model</class>
+			</mailchimp>
+		</models>
 
 		<events>
 			<newsletter_subscriber_save_commit_after>
 				<observers>
 					<subscriber_observer>
 						<type>singleton</type>
-						<class>Cammino_Mailchimp_Model_SubscriberObserver</class>
+						<class>Cammino_Mailchimp_Model_Observer_Subscriber</class>
 						<method>sync</method>
 					</subscriber_observer>
 				</observers>
 			</newsletter_subscriber_save_commit_after>
+
+			<checkout_onepage_controller_success_action>
+				<observers>
+					<ecommerce360_observer>
+						<type>singleton</type>
+						<class>Cammino_Mailchimp_Model_Observer_Ecommerce360</class>
+						<method>addMcOrder</method>
+					</ecommerce360_observer>
+				</observers>
+			</checkout_onepage_controller_success_action>
 		</events>
 
+		
 	</global>
+
+	<frontend>
+		<routers>
+			<mailchimp>
+				<use>standard</use>
+				<args>
+					<module>Cammino_Mailchimp</module>
+					<frontName>mailchimp</frontName>
+				</args>
+			</mailchimp>
+		</routers>
+	</frontend>
 </config>

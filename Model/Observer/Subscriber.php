@@ -2,7 +2,7 @@
 
 require_once(Mage::getBaseDir('lib') . '/MailChimp/MailChimp.php');
 
-class Cammino_Mailchimp_Model_SubscriberObserver extends Varien_Object
+class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
 {
 
     public function sync(Varien_Event_Observer $observer) {
