@@ -17,6 +17,8 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 $subscriber = $event->getSubscriber();
                 $params = array();
                 $mergeVars = array();
+                $quote = $this->getQuote();
+                $quoteCustomerName = null;
 
                 if (Mage::app() && Mage::app()->getRequest()) {
                     $params = Mage::app()->getRequest()->getParams();
@@ -37,6 +39,12 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
 
                 $defaultGroupId = Mage::getStoreConfig("newsletter/mailchimp/default_group_id");
                 $defaultInterestGroup = Mage::getStoreConfig("newsletter/mailchimp/default_interest_group");
+
+                if ($quote != null) {
+                    $quoteCustomerName = $quote->getCustomerFirstname() . ' ' . $quote->getCustomerLastname();
+
+                    $params[$nameParam] = $quoteCustomerName;
+                }
 
                 $email  = $subscriber->getEmail();
                 $name   = isset($params[$nameParam]) ? ( !empty($lastNameMergeVar) ? $this->getName($params[$nameParam]) : $params[$nameParam] ) : "";
@@ -110,5 +118,14 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
         }
 
         return array( 'firstName' => $name[0], 'lastName' => $lastName );
+    }
+
+    private function getQuote() {
+        try {
+            $session = Mage::getSingleton('checkout/session');
+            return $session->getQuote();
+        } catch(Exception $ex) {
+            return null;
+        }
     }
 }
