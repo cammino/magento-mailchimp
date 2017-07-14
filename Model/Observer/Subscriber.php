@@ -40,10 +40,16 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 $defaultGroupId = Mage::getStoreConfig("newsletter/mailchimp/default_group_id");
                 $defaultInterestGroup = Mage::getStoreConfig("newsletter/mailchimp/default_interest_group");
 
-                if ($quote != null) {
+                if( isset($params["firstname"]) && (strlen($params["firstname"]) > 1) ){
+                    $params[$nameParam] = $params["firstname"];
+                    if(isset($params["lastname"]) && (strlen($params["lastname"]) > 1) ){
+                        $params[$nameParam] .= " " . $params["lastname"];
+                    }
+                }else if($quote != null) {
                     $quoteCustomerName = $quote->getCustomerFirstname() . ' ' . $quote->getCustomerLastname();
-
-                    $params[$nameParam] = $quoteCustomerName;
+                    if(strlen($quoteCustomerName) > 2){
+                        $params[$nameParam] = $quoteCustomerName;
+                    }
                 }
 
                 $email  = $subscriber->getEmail();
