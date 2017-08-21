@@ -11,7 +11,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
 
             $active = Mage::getStoreConfig("newsletter/mailchimp/active");
 
-            if (intval($active) == 1) {
+            if (intval($active) == 1) {               
 
                 $event = $observer->getEvent();
                 $subscriber = $event->getSubscriber();
@@ -40,17 +40,22 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 $defaultGroupId = Mage::getStoreConfig("newsletter/mailchimp/default_group_id");
                 $defaultInterestGroup = Mage::getStoreConfig("newsletter/mailchimp/default_interest_group");
 
-                if( isset($params["firstname"]) && (strlen($params["firstname"]) > 1) ){
+                if(isset($params["firstname"]) && (strlen($params["firstname"]) > 1) ){
                     $params[$nameParam] = $params["firstname"];
                     if(isset($params["lastname"]) && (strlen($params["lastname"]) > 1) ){
                         $params[$nameParam] .= " " . $params["lastname"];
                     }
-                }else if($quote != null) {
+                } else if ($quote != null) {
                     $quoteCustomerName = $quote->getCustomerFirstname() . ' ' . $quote->getCustomerLastname();
                     if(strlen($quoteCustomerName) > 2){
                         $params[$nameParam] = $quoteCustomerName;
                     }
                 }
+
+                // if ($quote != null) {
+                //     $quoteCustomerName = $quote->getCustomerFirstname() . ' ' . $quote->getCustomerLastname();
+                //     $params[$nameParam] = $quoteCustomerName;
+                // }
 
                 $email  = $subscriber->getEmail();
                 $name   = isset($params[$nameParam]) ? ( !empty($lastNameMergeVar) ? $this->getName($params[$nameParam]) : $params[$nameParam] ) : "";
@@ -101,7 +106,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                             'replace_interests' => 'false',
                             'merge_vars' => $mergeVars
                         );
-
+                        
                         $callResult = $mailchimp->call('lists/subscribe', $request);
                     }
                 }
