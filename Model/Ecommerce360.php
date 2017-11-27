@@ -79,8 +79,8 @@ class Cammino_Mailchimp_Model_Ecommerce360 extends Mage_Core_Model_Abstract {
 				'product_id' => (int)$item->getId(), 
 				'sku' => $item->getSku(),
 				'product_name' => $item->getName(),
-				'category_id' => (int)$cat->getId(),
-				'category_name' => $cat->getName(),
+				'category_id' => ($cat != null) ? (int)$cat->getId() : 0,
+				'category_name' => ($cat != null) ? $cat->getName() : '',
 				'qty'  => (double)number_format($item->getQtyOrdered(), 0, '', ''),
 				'cost' => (double)number_format($item->getBasePrice(), 2, '.', '')
 			);
