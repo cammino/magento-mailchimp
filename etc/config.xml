@@ -28,14 +28,21 @@
 					</subscriber_observer>
 				</observers>
 			</newsletter_subscriber_save_commit_after>
-
+			<!-- <controller_action_predispatch_checkout_cart_add>
+				<observers>
+					<ecommerce_observerr>
+						<class>Cammino_Mailchimp_Model_Observer_Ecommerce</class>
+						<method>addMcCart</method>
+					</ecommerce_observerr>
+				</observers>
+			</controller_action_predispatch_checkout_cart_add> -->
 			<checkout_onepage_controller_success_action>
 				<observers>
-					<ecommerce360_observer>
+					<ecommerce_observer>
 						<type>singleton</type>
-						<class>Cammino_Mailchimp_Model_Observer_Ecommerce360</class>
+						<class>Cammino_Mailchimp_Model_Observer_Ecommerce</class>
 						<method>addMcOrder</method>
-					</ecommerce360_observer>
+					</ecommerce_observer>
 				</observers>
 			</checkout_onepage_controller_success_action>
 		</events>
