@@ -8,8 +8,7 @@ class Cammino_Mailchimp_Block_Ecommerce extends Mage_Core_Block_Template {
 	}
 
 	protected function _toHtml() {
-		Mage::log("passou pelo Block -------- Função tohtml", null, 'mailchimp-ecommerce-api.log');
-		
+
 		$html = "";
 		Mage::app()->getStore()->isCurrentlySecure();
 		 if (strval($this->_enabled) == "1") {

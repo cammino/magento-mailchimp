@@ -15,6 +15,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	public function cart($quote) {
+
 		if ($this->_enabled && $this->_store_id) {
 			try {
 				$this->handleProduct($quote->getAllItems());				
@@ -27,9 +28,9 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	public function order($orderId) {
+		$orderId = 500011416;
 		if ($this->_enabled && $this->_store_id) {
 			try {
-				Mage::log("passou pelo model -------- Função order", null, 'mailchimp-ecommerce-api.log');
 				// $mailchimp  = new MailChimp3($this->_token);
 				// $request2 = $mailchimp->post('ecommerce/stores', array(
 				// 		"id" => "vital-atman",
@@ -68,6 +69,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			}
 		}
 	}
+
 	private function getQuote($quote) {
 		$customer = $this->getCustomer($quote, null);
 		$products = $this->getProducts($quote->getAllItems());
@@ -123,14 +125,12 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function getProducts($items) {
-        
-		foreach ($items as $item) {	
-			$result[] = array(
+        foreach ($items as $item) {	
+        	$result[] = array(
 				'id' => $item->getProductId(), 
 				'product_id' => $item->getProductId(), 
 				'product_variant_id' => $item->getProductId(), 
-				// 'quantity'  => (double)number_format($item->getQtyOrdered(), 0, '', ''),
-				'quantity' => 1,
+				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
 				'price' => (double)number_format($item->getBasePrice(), 2, '.', '')
 			);
         }
