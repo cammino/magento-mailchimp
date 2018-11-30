@@ -82,10 +82,12 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			'id' => $quote->getId(),
 			'customer' => $customer,
 			'currency_code' => 'BRL',
-			'order_total' => (double)number_format($quote->getGrandTotal(), 2, '.', ''),
-			'campaign_id' => Mage::getSingleton('core/session')->getCampaignCode() ? Mage::getSingleton('core/session')->getCampaignCode() : NULL,
+			'order_total' => (double)number_format($quote->getGrandTotal(), 2, '.', '');
 			'lines' => $products
 		);
+
+		if (Mage::getSingleton('core/session')->getCampaignCode())
+			$result['campaign_id']= Mage::getSingleton('core/session')->getCampaignCode();
 		return $result;
 	}
 
@@ -106,10 +108,10 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			'currency_code' => 'BRL',
 			'order_total' => (double)number_format($order->getBaseGrandTotal(), 2, '.', ''),
 			'shipping_total' => (double)number_format($order->getBaseShippingAmount(), 2, '.', ''),
-			'campaign_id' => Mage::getSingleton('core/session')->getCampaignCode() ? Mage::getSingleton('core/session')->getCampaignCode() : NULL,
 			'lines' => $products
 		);
-		
+		if (Mage::getSingleton('core/session')->getCampaignCode())
+			$result['campaign_id']= Mage::getSingleton('core/session')->getCampaignCode();
 		return $result;
 	}
 
