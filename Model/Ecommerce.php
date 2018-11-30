@@ -35,7 +35,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			try {
 				$this->handleProduct($quote->getAllItems());				
 				$addQuote = $this->getQuote($quote);
-				$callResultAddQuote = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/orders', $addQuote);
+				$callResultAddQuote = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/cart', $addQuote);
 			} catch (Exception $e) {
 				var_dump($e->getMessage()); die;
 			}
