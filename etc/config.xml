@@ -46,9 +46,16 @@
 					</ecommerce_observer_send_cart>
 				</observers>
 			</controller_action_layout_render_before_checkout_cart_index>
-		</events>
-
-		
+			<controller_action_layout_load_before>
+                <observers>
+                    <campaign_observer>
+                        <type>singleton</type>
+                        <class>Cammino_Mailchimp_Model_Observer_Ecommerce</class>
+                        <method>setCampaign</method>
+                    </campaign_observer>
+                </observers>
+            </controller_action_layout_load_before>
+		</events>		
 	</global>
 
 	<frontend>

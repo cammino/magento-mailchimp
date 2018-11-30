@@ -24,5 +24,13 @@ class Cammino_Mailchimp_Model_Observer_Ecommerce extends Varien_Object
 		$block->toHtml();
 	}
 
+	public function setCampaign(Varien_Event_Observer $observer) {
+		$campaign = Mage::app()->getRequest()->getParam('mc_cid');
+        $session = Mage::getSingleton('core/session');
+        
+        if (strlen($campaign) > 0) {
+            $session->setCampaignCode($campaign);
+        }
+    }
 	
 }

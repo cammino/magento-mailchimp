@@ -11,11 +11,26 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		$this->_enabled  = Mage::getStoreConfig("newsletter/mailchimp/ecommerce");
 		$this->_token    = Mage::getStoreConfig("newsletter/mailchimp/token");
 		$this->_store_id = Mage::getStoreConfig("newsletter/mailchimp/store_id");
+		$this->_list_id  = Mage::getStoreConfig("newsletter/mailchimp/list_id");
 		$this->_mailchimp  = new MailChimp3($this->_token);
+		$this->store();
 	}
 
+	public function store() {
+		// se a loja não estiver vinculada com uma lista, faz o vínculo e muda valor da config do admin
+		if (!Mage::getStoreConfig("newsletter/mailchimp/store_linked_to_list")) {
+			$params = array(
+				  "id" => $this->_store_id,
+			      "list_id" => $this->_list_id,
+			      "name" => Mage::app()->getStore()->getName(),
+			      "currency_code" => "BRL"
+			);
+			$request = $this->_mailchimp->post('ecommerce/stores', $params);
+			
+			Mage::getModel('core/config')->saveConfig("newsletter/mailchimp/store_linked_to_list", 1);
+		}
+	}
 	public function cart($quote) {
-
 		if ($this->_enabled && $this->_store_id) {
 			try {
 				$this->handleProduct($quote->getAllItems());				
@@ -28,20 +43,8 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	public function order($orderId) {
-		$orderId = 500011416;
 		if ($this->_enabled && $this->_store_id) {
 			try {
-				// $mailchimp  = new MailChimp3($this->_token);
-				// $request2 = $mailchimp->post('ecommerce/stores', array(
-				// 		"id" => "vital-atman",
-				//       "list_id" => "f032d2565b",
-				//       "name" => "Vital Atman",
-				//       "domain" => "www.vitalatman.com.br",
-				//       "email_address" => "teste@teste.com",
-				//       "currency_code" => "BRL"
-				// 	)
-				// );
-				// var_dump($request2);die;
 				// $request3 = $mailchimp->get('ecommerce/stores', []);
 				// var_dump($request3);die;
 				// $request4 = $mailchimp->get('ecommerce/stores/vital-atman/products', []);
@@ -54,6 +57,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				
 				$addOrder	 = $this->getOrder($order);
 				$callResultAddOrder = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/orders', $addOrder);
+				
 			} catch (Exception $e) {
 				var_dump($e->getMessage()); die;
 			}
@@ -73,14 +77,15 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	private function getQuote($quote) {
 		$customer = $this->getCustomer($quote, null);
 		$products = $this->getProducts($quote->getAllItems());
+		;
 		$result = array(
 			'id' => $quote->getId(),
 			'customer' => $customer,
 			'currency_code' => 'BRL',
 			'order_total' => (double)number_format($quote->getGrandTotal(), 2, '.', ''),
+			'campaign_id' => Mage::getSingleton('core/session')->getCampaignCode() ? Mage::getSingleton('core/session')->getCampaignCode() : NULL,
 			'lines' => $products
 		);
-
 		return $result;
 	}
 
@@ -101,9 +106,10 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			'currency_code' => 'BRL',
 			'order_total' => (double)number_format($order->getBaseGrandTotal(), 2, '.', ''),
 			'shipping_total' => (double)number_format($order->getBaseShippingAmount(), 2, '.', ''),
+			'campaign_id' => Mage::getSingleton('core/session')->getCampaignCode() ? Mage::getSingleton('core/session')->getCampaignCode() : NULL,
 			'lines' => $products
 		);
-
+		
 		return $result;
 	}
 
