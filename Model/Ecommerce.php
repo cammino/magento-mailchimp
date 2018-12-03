@@ -56,7 +56,9 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				$this->handleProduct($order->getAllVisibleItems());				
 				
 				$addOrder	 = $this->getOrder($order);
+				Mage::log($addOrder, null, 'mailchimp-ecommerce-api.log');
 				$callResultAddOrder = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/orders', $addOrder);
+				Mage::log($callResultAddOrder, null, 'mailchimp-ecommerce-api.log');
 				
 			} catch (Exception $e) {
 				var_dump($e->getMessage()); die;
@@ -82,7 +84,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			'id' => $quote->getId(),
 			'customer' => $customer,
 			'currency_code' => 'BRL',
-			'order_total' => (double)number_format($quote->getGrandTotal(), 2, '.', '');
+			'order_total' => (double)number_format($quote->getGrandTotal(), 2, '.', ''),
 			'lines' => $products
 		);
 
