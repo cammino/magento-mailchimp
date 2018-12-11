@@ -110,6 +110,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			'currency_code' => 'BRL',
 			'order_total' => (double)number_format($order->getBaseGrandTotal(), 2, '.', ''),
 			'shipping_total' => (double)number_format($order->getBaseShippingAmount(), 2, '.', ''),
+			'processed_at_foreign' => $order->getCreatedAt(),
 			'lines' => $products
 		);
 		if (Mage::getSingleton('core/session')->getCampaignCode())
