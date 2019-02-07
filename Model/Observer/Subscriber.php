@@ -30,6 +30,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 $nameParam = Mage::getStoreConfig("newsletter/mailchimp/name_param");
                 $nameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/name_merge_var");
                 $lastNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/last_name_merge_var");
+                $genderNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/gender_merge_var");
 
                 $originParam = Mage::getStoreConfig("newsletter/mailchimp/origin_param");
                 $originMergeVar = Mage::getStoreConfig("newsletter/mailchimp/origin_merge_var");
@@ -73,6 +74,33 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                         $mergeVars[$lastNameMergeVar] = $name['lastName'];
                     } else {
                         $mergeVars[$nameMergeVar] = $name;
+                    }
+                }
+
+                // Manda o sexo(gender) do cliente
+                if(!empty($genderNameMergeVar)) {
+                    try {
+                        $customer = Mage::getModel("customer/customer"); 
+                        $customer->setWebsiteId(Mage::app()->getWebsite('admin')->getId()); 
+                        $customer->loadByEmail($email);
+
+                        if($customer->getId()) {
+                            $gender = $customer->getResource()->getAttribute('gender')->getSource()->getOptionText($customer->getData('gender'));
+                            $gender = strtolower($gender);
+                            
+                            if($gender == "masculino" || $gender == "male" || $gender == "homem") {
+                                $gender = "M";
+                            } elseif($gender == "feminino" || $gender == "female" || $gender == "mulher") {
+                                $gender = "F";
+                            }
+
+                            if(!empty($gender)) {
+                                $mergeVars[$genderNameMergeVar] = $gender;
+                            }
+                        }
+                    } catch (Exception $e) {
+                        Mage::log("Erro ao enviar o gênero do cliente para o mailchimp", null, "subscriber.log");
+                        Mage::log($e->getMessage(), null, "subscriber.log");
                     }
                 }
 
