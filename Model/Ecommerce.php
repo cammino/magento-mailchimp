@@ -118,10 +118,11 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		return $result;
 	}
 
-	private function postProducts($item) {		
+	private function postProducts($item) {
 		$result = array(
 			'id' => $item->getProductId(), 
 			'title' => $item->getName(),
+			'vendor' => 'Cabelos',
 			'variants' => array(
 				array(
 					'id' => $item->getProductId(), 
