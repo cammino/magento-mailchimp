@@ -181,7 +181,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				'product_variant_id' => $item->getProductId(), 
 				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
 				'price' => (double)number_format($item->getBasePrice(), 2, '.', ''),
-				'vendor' => $data["vendor"]
+				'vendor' => 'Teste Luan'
 			);
         }
 	  	
