@@ -173,14 +173,27 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 
 	private function getProducts($items) {
         foreach ($items as $item) {
-			$categoryName = $this->getProductCategories($item);
+			// $categoryName = $this->getProductCategories($item);
 
-			Mage::log('Categorias: ' . $categoryName, null, 'mailchimp-ecommerce-api.log');
+			// Mage::log('Categorias: ' . $categoryName, null, 'mailchimp-ecommerce-api.log');
 
-			if ($categoryName) {
-				$data["type"] = $categoryName;
-				$data["vendor"] = $data["type"];
-			}
+			// if ($categoryName) {
+			// 	$data["type"] = $categoryName;
+			// 	$data["vendor"] = $data["type"];
+			// }
+
+			$array = array();
+			$string = "";
+			$cats = $item->getCategoryIds();
+
+			foreach ($cats as $category_id) :
+				$_cat = Mage::getModel('catalog/category')->load($category_id);
+				array_push($array, $_cat->getName());
+			endforeach;
+
+			foreach($array as $valor) :
+				$string = $string . $valor . ', ';
+			endforeach;
 
         	$result[] = array(
 				'id' => $item->getProductId(), 
@@ -188,7 +201,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				'product_variant_id' => $item->getProductId(), 
 				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
 				'price' => (double)number_format($item->getBasePrice(), 2, '.', ''),
-				'vendor' => 'Teste Luan'
+				'vendor' => $string
 			);
         }
 	  	
