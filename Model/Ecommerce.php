@@ -119,10 +119,17 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function postProducts($item) {
+		$categoryName = $this->getProductCategories($item);
+
+		if ($categoryName) {
+			$data["type"] = $categoryName;
+			$data["vendor"] = $data["type"];
+		}
+
 		$result = array(
 			'id' => $item->getProductId(), 
 			'title' => $item->getName(),
-			'vendor' => 'Cabelos',
+			'vendor' => $data["vendor"],
 			'variants' => array(
 				array(
 					'id' => $item->getProductId(), 
@@ -135,6 +142,29 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
         
 	  	return $result;
 	}
+
+	protected function getProductCategories($product)
+    {
+        $categoryIds = $product->getCategoryIds();
+        $categoryNames = array();
+		$categoryName = null;
+
+        if (is_array($categoryIds) && count($categoryIds)) {
+            $collection = Mage::getModel('catalog/category')->getCollection();
+            $collection->addAttributeToSelect(array('name'))
+                ->addAttributeToFilter('is_active', array('eq' => '1'))
+                ->addAttributeToFilter('entity_id', array('in' => $categoryIds))
+                ->addAttributeToSort('level', 'asc');
+
+            foreach ($collection as $category) {
+                $categoryNames[] = $category->getName();
+			}
+
+            $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
+		}
+
+        return $categoryName;
+    }
 
 	private function getProducts($items) {
         foreach ($items as $item) {	
