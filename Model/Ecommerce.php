@@ -119,12 +119,12 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function postProducts($item) {
-		$categoryName = $this->getProductCategories($item);
+		// $categoryName = $this->getProductCategories($item);
 
-		if ($categoryName) {
-			$data["type"] = $categoryName;
-			$data["vendor"] = $data["type"];
-		}
+		// if ($categoryName) {
+		// 	$data["type"] = $categoryName;
+		// 	$data["vendor"] = $data["type"];
+		// }
 
 		$result = array(
 			'id' => $item->getProductId(), 
@@ -168,12 +168,20 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 
 	private function getProducts($items) {
         foreach ($items as $item) {	
+			$categoryName = $this->getProductCategories($item);
+
+			if ($categoryName) {
+				$data["type"] = $categoryName;
+				$data["vendor"] = $data["type"];
+			}
+
         	$result[] = array(
 				'id' => $item->getProductId(), 
 				'product_id' => $item->getProductId(), 
 				'product_variant_id' => $item->getProductId(), 
 				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
-				'price' => (double)number_format($item->getBasePrice(), 2, '.', '')
+				'price' => (double)number_format($item->getBasePrice(), 2, '.', ''),
+				'vendor' => $data["vendor"]
 			);
         }
 	  	
