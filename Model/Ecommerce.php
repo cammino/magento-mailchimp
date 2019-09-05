@@ -119,7 +119,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function postProducts($item) {
-		// $categoryName = $this->getProductCategories($item);
+		// $categoryName = $this->getbkpProductCategories($item);
 
 		// if ($categoryName) {
 		// 	$data["type"] = $categoryName;
@@ -145,9 +145,10 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 
 	protected function getProductCategories($product)
     {
-		Mage::log('Entrou no método de categorias', null, 'mailchimp-ecommerce-api.log');
+		$categoryIds = $product->getCategoryIds();
+		
+		Mage::log($categoryIds, null, 'mailchimp-ecommerce-api.log');
 
-        $categoryIds = $product->getCategoryIds();
         $categoryNames = array();
 		$categoryName = null;
 
