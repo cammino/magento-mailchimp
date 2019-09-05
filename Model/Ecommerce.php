@@ -119,13 +119,6 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function postProducts($item) {
-		// $categoryName = $this->getbkpProductCategories($item);
-
-		// if ($categoryName) {
-		// 	$data["type"] = $categoryName;
-		// 	$data["vendor"] = $data["type"];
-		// }
-
 		$result = array(
 			'id' => $item->getProductId(), 
 			'title' => $item->getName(),
@@ -147,8 +140,6 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
     {
 		$categoryIds = $product->getCategoryIds();
 		
-		Mage::log($categoryIds, null, 'mailchimp-ecommerce-api.log');
-
         $categoryNames = array();
 		$categoryName = null;
 
@@ -166,34 +157,19 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
             $categoryName = (count($categoryNames)) ? implode(" - ", $categoryNames) : 'None';
 		}
 
-		Mage::log('Categorias do método de categorias' . $categoryName, null, 'mailchimp-ecommerce-api.log');
-
         return $categoryName;
     }
 
 	private function getProducts($items) {
-        foreach ($items as $item) {
-			// $categoryName = $this->getProductCategories($item);
+		foreach ($items as $item) {
+			$product = Mage::getModel('catalog/product')->load($item->getProductId());
 
-			// Mage::log('Categorias: ' . $categoryName, null, 'mailchimp-ecommerce-api.log');
-
-			// if ($categoryName) {
-			// 	$data["type"] = $categoryName;
-			// 	$data["vendor"] = $data["type"];
-			// }
-
-			$array = array();
-			$string = "";
-			$cats = $item->getCategoryIds();
-
-			foreach ($cats as $category_id) :
-				$_cat = Mage::getModel('catalog/category')->load($category_id);
-				array_push($array, $_cat->getName());
-			endforeach;
-
-			foreach($array as $valor) :
-				$string = $string . $valor . ', ';
-			endforeach;
+			$categoryName = $this->getProductCategories($product);
+			
+			if ($categoryName) {
+				$data["type"] = $categoryName;
+				$data["vendor"] = $data["type"];
+			}		
 
         	$result[] = array(
 				'id' => $item->getProductId(), 
@@ -201,7 +177,8 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				'product_variant_id' => $item->getProductId(), 
 				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
 				'price' => (double)number_format($item->getBasePrice(), 2, '.', ''),
-				'vendor' => $string
+				'type' => $data["type"],
+				'vendor' => $data["vendor"]
 			);
         }
 	  	
