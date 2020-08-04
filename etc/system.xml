@@ -67,6 +67,14 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</gender_merge_var>
+						<group_name_merge_var translate="label">
+							<label>Group Name Merge Var</label>
+							<frontend_type>text</frontend_type>
+							<sort_order>7</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</group_name_merge_var>
 						<group_id_param translate="label">
 							<label>Group Id Param</label>
 							<frontend_type>text</frontend_type>
