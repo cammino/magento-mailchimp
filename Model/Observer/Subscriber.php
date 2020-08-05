@@ -118,7 +118,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                             $groupName = Mage::getModel('customer/group')->load($group)->getCustomerGroupCode();
                             // Mage::log($groupName, null, "andre.log");
 
-                            if(!empty($gender)) {
+                            if(!empty($groupName)) {
                                 $mergeVars[$groupNameMergeVar] = $groupName;
                             }
                         }
