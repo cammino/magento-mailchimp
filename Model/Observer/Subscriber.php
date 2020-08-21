@@ -33,6 +33,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 $genderNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/gender_merge_var");
 
                 $groupNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/group_name_merge_var");
+                $birthdayMergeVar = Mage::getStoreConfig("newsletter/mailchimp/birthday_merge_var");
 
                 $originParam = Mage::getStoreConfig("newsletter/mailchimp/origin_param");
                 $originMergeVar = Mage::getStoreConfig("newsletter/mailchimp/origin_merge_var");
@@ -124,6 +125,27 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                         }
                     } catch (Exception $e) {
                         Mage::log("Erro ao enviar o nome do grupo do cliente para o mailchimp", null, "subscriber.log");
+                        Mage::log($e->getMessage(), null, "subscriber.log");
+                    }
+                }
+
+                // Envia a data de nascimento (Birthday Merge Var) do cliente
+                if(!empty($birthdayMergeVar)) {
+                    try {
+                        $customer = Mage::getModel("customer/customer");
+                        $customer->setWebsiteId(Mage::app()->getStore()->getWebsiteId());
+                        $customer->loadByEmail($email);
+
+                        if ($customer->getId()) {
+                            $birthday = $customer->getDob();
+                            Mage::log($birthday, null, "andre.log"); die;
+
+                            if(!empty($birthday)) {
+                                $mergeVars[$birthdayMergeVar] = $birthday;
+                            }
+                        }
+                    } catch (Exception $e) {
+                        Mage::log("Erro ao enviar a data de nascimento do cliente para o mailchimp", null, "subscriber.log");
                         Mage::log($e->getMessage(), null, "subscriber.log");
                     }
                 }
