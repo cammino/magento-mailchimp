@@ -102,8 +102,6 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                             }
                         }
                     } catch (Exception $e) {
-                        Mage::log("Erro ao enviar o gênero do cliente para o mailchimp", null, "subscriber.log");
-                        Mage::log($e->getMessage(), null, "subscriber.log");
                     }
                 }
 
@@ -117,15 +115,13 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                         if ($customer->getId()) {
                             $group = $customer->getGroupId();
                             $groupName = Mage::getModel('customer/group')->load($group)->getCustomerGroupCode();
-                            // Mage::log($groupName, null, "andre.log");
 
                             if(!empty($groupName)) {
                                 $mergeVars[$groupNameMergeVar] = $groupName;
                             }
                         }
                     } catch (Exception $e) {
-                        Mage::log("Erro ao enviar o nome do grupo do cliente para o mailchimp", null, "subscriber.log");
-                        Mage::log($e->getMessage(), null, "subscriber.log");
+                        Mage::log($e->getMessage(), null, 'mailchimp.log');
                     }
                 }
 
@@ -138,15 +134,13 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
 
                         if ($customer->getId()) {
                             $birthday = $customer->getDob();
-                            Mage::log($birthday, null, "andre.log"); die;
 
                             if(!empty($birthday)) {
                                 $mergeVars[$birthdayMergeVar] = $birthday;
                             }
                         }
                     } catch (Exception $e) {
-                        Mage::log("Erro ao enviar a data de nascimento do cliente para o mailchimp", null, "subscriber.log");
-                        Mage::log($e->getMessage(), null, "subscriber.log");
+                        Mage::log($e->getMessage(), null, 'mailchimp.log');
                     }
                 }
 
@@ -187,7 +181,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
 
             }
         } catch (Exception $e) {
-            Mage::log($e, null, 'subscriber.log');
+            Mage::log($e, null, 'mailchimp.log');
         }
     }
 

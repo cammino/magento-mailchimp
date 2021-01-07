@@ -7,7 +7,7 @@
  * @author  Drew McLellan <drew.mclellan@gmail.com>
  * @version 2.5
  */
-class Mailchimp3
+class MailChimp3
 {
     private $api_key;
     private $api_endpoint = 'https://<dc>.api.mailchimp.com/3.0';

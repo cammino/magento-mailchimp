@@ -1,6 +1,5 @@
 <?php 
 
-require_once(Mage::getBaseDir('lib') . '/MailChimp/MailChimp.php');
 require_once(Mage::getBaseDir('lib') . '/MailChimp/MailChimp3.php');
 
 class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
@@ -12,12 +11,12 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		$this->_token    = Mage::getStoreConfig("newsletter/mailchimp/token");
 		$this->_store_id = Mage::getStoreConfig("newsletter/mailchimp/store_id");
 		$this->_list_id  = Mage::getStoreConfig("newsletter/mailchimp/list_id");
+		$this->_debug    = Mage::getStoreConfig("newsletter/mailchimp/debug");
 		$this->_mailchimp  = new MailChimp3($this->_token);
 		$this->store();
 	}
 
 	public function store() {
-		// se a loja não estiver vinculada com uma lista, faz o vínculo e muda valor da config do admin
 		if (!Mage::getStoreConfig("newsletter/mailchimp/store_linked_to_list")) {
 			$params = array(
 				  "id" => $this->_store_id,
@@ -31,37 +30,39 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		}
 	}
 	public function cart($quote) {
+
+		$this->log('New cart sent.');
+
 		if ($this->_enabled && $this->_store_id) {
 			try {
 				$this->handleProduct($quote->getAllItems());				
 				$addQuote = $this->getQuote($quote);
 				$callResultAddQuote = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/carts', $addQuote);
+
+				$this->log($callResultAddQuote);
+
 			} catch (Exception $e) {
-				var_dump($e->getMessage()); die;
+				Mage::log($e->getMessage(), null, 'mailchimp.log');
 			}
 		}
 	}
 
 	public function order($orderId) {
+
+		$this->log('New order sent.');
+
 		if ($this->_enabled && $this->_store_id) {
 			try {
-				// $request3 = $mailchimp->get('ecommerce/stores', []);
-				// var_dump($request3);die;
-				// $request4 = $mailchimp->get('ecommerce/stores/vital-atman/products', []);
-				// var_dump($request4);die;
-				// $request4	 = $this->postProducts($orderId);
-				// $callResult  = $mailchimp->post('ecommerce/stores/vital-atman/products', $request4);
-				// var_dump($callResult);die;
 				$order 	  = Mage::getModel('sales/order')->loadByIncrementId($orderId);
 				$this->handleProduct($order->getAllVisibleItems());				
 				
 				$addOrder	 = $this->getOrder($order);
-				Mage::log($addOrder, null, 'mailchimp-ecommerce-api.log');
 				$callResultAddOrder = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/orders', $addOrder);
-				Mage::log($callResultAddOrder, null, 'mailchimp-ecommerce-api.log');
+
+				$this->log($callResultAddOrder);
 				
 			} catch (Exception $e) {
-				var_dump($e->getMessage()); die;
+				Mage::log($e->getMessage(), null, 'mailchimp.log');
 			}
 		}
 	}
@@ -172,5 +173,11 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		}
 
 		return $customer;
+	}
+
+	private function log($content) {
+		if ($this->_debug) {
+			Mage::log($content, null, 'mailchimp.log');	
+		}
 	}
 }
