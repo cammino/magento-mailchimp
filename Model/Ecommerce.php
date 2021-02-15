@@ -95,6 +95,9 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function verifyProduct($productId) {
+		if (Mage::getStoreConfig("newsletter/mailchimp/verification_skip")) {
+			return true;
+		}
 		$returnGetProduct = $this->_mailchimp->get('ecommerce/stores/' . $this->_store_id . '/products/' . $productId, []);
 		return ($returnGetProduct['status'] == 404);		
 	}
