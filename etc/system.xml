@@ -167,10 +167,9 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</debug>
-						<verification_skip translate="label">
-							<label>Pular verificação de produtos por ID - Ecommerce (Força um post para todos os produtos, atualizando os dados em todas as requisições)</label>
-							<frontend_type>select</frontend_type>
-							<source_model>adminhtml/system_config_source_yesno</source_model>
+						<initial_id translate="label">
+							<label>Número de serialização que irá serincrementado em todos os produtos ao enviar para o Mailchimp, para evitar pegar produtos errados</label>
+							<frontend_type>text</frontend_type>
 							<sort_order>17</sort_order>
 							<show_in_default>1</show_in_default>
 							<show_in_website>1</show_in_website>
