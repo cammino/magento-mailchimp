@@ -139,7 +139,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	private function getProducts($items) {
         foreach ($items as $item) {	
         	$result[] = array(
-				'id' => $item->getProductId(), 
+				'product_id' => (int)$item->getProductId() + (int)Mage::getStoreConfig("newsletter/mailchimp/initial_id"),
 				'product_id' => (int)$item->getProductId() + (int)Mage::getStoreConfig("newsletter/mailchimp/initial_id"),
 				'product_variant_id' => $item->getProductId(), 
 				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
