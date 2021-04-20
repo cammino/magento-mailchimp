@@ -7,12 +7,13 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	private $_token, $_enabled;
 
 	protected function _construct() {
-		$this->_enabled  = Mage::getStoreConfig("newsletter/mailchimp/ecommerce");
-		$this->_token    = Mage::getStoreConfig("newsletter/mailchimp/token");
-		$this->_store_id = Mage::getStoreConfig("newsletter/mailchimp/store_id");
-		$this->_list_id  = Mage::getStoreConfig("newsletter/mailchimp/list_id");
-		$this->_debug    = Mage::getStoreConfig("newsletter/mailchimp/debug");
+		$this->_enabled    = Mage::getStoreConfig("newsletter/mailchimp/ecommerce");
+		$this->_token      = Mage::getStoreConfig("newsletter/mailchimp/token");
+		$this->_store_id   = Mage::getStoreConfig("newsletter/mailchimp/store_id");
+		$this->_list_id    = Mage::getStoreConfig("newsletter/mailchimp/list_id");
+		$this->_debug      = Mage::getStoreConfig("newsletter/mailchimp/debug");
 		$this->_mailchimp  = new MailChimp3($this->_token);
+		$this->_initial_id = (int)Mage::getStoreConfig("newsletter/mailchimp/initial_id");
 		$this->store();
 	}
 
@@ -30,7 +31,6 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		}
 	}
 	public function cart($quote) {
-
 		$this->log('New cart sent.');
 
 		if ($this->_enabled && $this->_store_id) {
@@ -70,7 +70,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	private function handleProduct($items) {
 		foreach($items as $item) {
 	        $productsVerification = $this->verifyProduct($item->getProductId());
-	        if ($productsVerification) {
+	        if (!$productsVerification) {
 				$addProduct = $this->postProducts($item);
 				$callResult = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/products', $addProduct);
 			}
@@ -80,7 +80,6 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	private function getQuote($quote) {
 		$customer = $this->getCustomer($quote, null);
 		$products = $this->getProducts($quote->getAllItems());
-		;
 		$result = array(
 			'id' => $quote->getId(),
 			'customer' => $customer,
@@ -95,8 +94,8 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 	}
 
 	private function verifyProduct($productId) {
-		$returnGetProduct = $this->_mailchimp->get('ecommerce/stores/' . $this->_store_id . '/products/' . $productId, []);
-		return ($returnGetProduct['status'] == 404);
+		$returnGetProduct = $this->_mailchimp->get('ecommerce/stores/' . $this->_store_id . '/products/' . (string)($productId  + $this->_initial_id), []);
+		return(!empty($returnGetProduct['id']));
 	}
 
 	private function getOrder($order)
@@ -105,7 +104,8 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 		$products = $this->getProducts($order->getAllVisibleItems());
 		
 		$result = array(
-			'id' => $order->getIncrementId(),
+			'id' => (string)$order->getIncrementId(),
+			'store_id' => $this->_store_id,
 			'customer' => $customer,
 			'email' => $order->getCustomerEmail(),
 			'currency_code' => 'BRL',
@@ -121,27 +121,26 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 
 	private function postProducts($item) {		
 		$result = array(
-			'id' => $item->getProductId(), 
+			'id' => (string)($item->getProductId() + $this->_initial_id),
 			'title' => $item->getName(),
 			'variants' => array(
 				array(
-					'id' => $item->getProductId(), 
+					'id' => (string)($item->getProductId() + $this->_initial_id),
 					'title' => $item->getName(),
 					'price' => (double)number_format($item->getBasePrice(), 2, '.', ''),
 					'sku'   => $item->getSku()
 				)
 			), 
 		);
-        
 	  	return $result;
 	}
 
 	private function getProducts($items) {
         foreach ($items as $item) {	
         	$result[] = array(
-				'product_id' => (int)$item->getProductId() + (int)Mage::getStoreConfig("newsletter/mailchimp/initial_id"),
-				'product_id' => (int)$item->getProductId() + (int)Mage::getStoreConfig("newsletter/mailchimp/initial_id"),
-				'product_variant_id' => $item->getProductId(), 
+				'id' => (string)($item->getProductId() + $this->_initial_id),
+				'product_id' => (string)($item->getProductId() + $this->_initial_id),
+				'product_variant_id' => (string)($item->getProductId() + $this->_initial_id), 
 				'quantity'  => $item->getQtyOrdered() ? (double)number_format($item->getQtyOrdered(), 0, '', ''): (double)number_format($item->getQty(), 0, '', ''),
 				'price' => (double)number_format($item->getBasePrice(), 2, '.', '')
 			);
