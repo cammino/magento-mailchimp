@@ -38,8 +38,16 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				$this->handleProduct($quote->getAllItems());				
 				$addQuote = $this->getQuote($quote);
 				$callResultAddQuote = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/carts', $addQuote);
-
 				$this->log($callResultAddQuote);
+
+				if ($callResultAddQuote['title'] = 'Cart Already Exists') {
+					$updateQuote = array(
+						'checkout_url' => Mage::getUrl('checkout/cart'),
+						'lines' => $addQuote['lines']
+					);
+					$callResultUpdateQuote = $this->_mailchimp->patch('ecommerce/stores/' . $this->_store_id . '/carts/'. $addQuote['id'], $updateQuote);
+					$this->log($callResultUpdateQuote);				
+				}
 
 			} catch (Exception $e) {
 				Mage::log($e->getMessage(), null, 'mailchimp.log');
@@ -85,6 +93,7 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 			'customer' => $customer,
 			'currency_code' => 'BRL',
 			'order_total' => (double)number_format($quote->getGrandTotal(), 2, '.', ''),
+			'checkout_url' => Mage::getUrl('checkout/cart'),
 			'lines' => $products
 		);
 
