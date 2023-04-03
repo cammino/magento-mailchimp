@@ -54,6 +54,12 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                     if(strlen($quoteCustomerName) > 2){
                         $params[$nameParam] = $quoteCustomerName;
                     }
+                } if ((empty($params[$nameParam])) && (!empty($subscriber->getCustomerId()))) {
+                    $customer = Mage::getModel('customer/customer')->load($subscriber->getCustomerId());
+                    $customerName = $customer->getFirstname() . ' ' . $customer->getLastname();
+                    if(strlen($customerName) > 2){
+                        $params[$nameParam] = $customerName;
+                    }
                 }
 
                 // if ($quote != null) {
@@ -83,9 +89,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 // Manda o sexo(gender) do cliente
                 if(!empty($genderNameMergeVar)) {
                     try {
-                        $customer = Mage::getModel("customer/customer"); 
-                        $customer->setWebsiteId(Mage::app()->getWebsite('admin')->getId()); 
-                        $customer->loadByEmail($email);
+                        $customer = Mage::getModel("customer/customer")->load($subscriber->getCustomerId());
 
                         if($customer->getId()) {
                             $gender = $customer->getResource()->getAttribute('gender')->getSource()->getOptionText($customer->getData('gender'));
@@ -108,9 +112,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 // Envia o Nome do Grupo(Group Name Merge Var) do cliente
                 if(!empty($groupNameMergeVar)) {
                     try {
-                        $customer = Mage::getModel("customer/customer");
-                        $customer->setWebsiteId(Mage::app()->getStore()->getWebsiteId());
-                        $customer->loadByEmail($email);
+                        $customer = Mage::getModel("customer/customer")->load($subscriber->getCustomerId());
 
                         if ($customer->getId()) {
                             $group = $customer->getGroupId();
@@ -128,9 +130,7 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 // Envia a data de nascimento (Birthday Merge Var) do cliente
                 if(!empty($birthdayMergeVar)) {
                     try {
-                        $customer = Mage::getModel("customer/customer");
-                        $customer->setWebsiteId(Mage::app()->getStore()->getWebsiteId());
-                        $customer->loadByEmail($email);
+                        $customer = Mage::getModel("customer/customer")->load($subscriber->getCustomerId());
 
                         if ($customer->getId()) {
                             $birthday = $customer->getDob();
