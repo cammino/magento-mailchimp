@@ -1,6 +1,6 @@
 <?php
 
-require_once(Mage::getBaseDir('lib') . '/MailChimp/MailChimp.php');
+require_once(Mage::getBaseDir('lib') . '/MailChimp/MailChimp3.php');
 
 class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
 {
@@ -74,8 +74,10 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                 $groupId = isset($params[$groupIdParam]) ? $params[$groupIdParam] : $defaultGroupId;
                 $interestGroup = isset($params[$interestGroupParam]) ? $params[$interestGroupParam] : $defaultInterestGroup;
                 
-                $mailchimp = new MailChimp($token);
-                $mailchimp->set_timeout(3);
+                
+        		$mailchimp  = new MailChimp3(Mage::getStoreConfig("newsletter/mailchimp/token"));
+//                $mailchimp = new MailChimp3($token);
+//                $mailchimp->set_timeout(3);
 
                 if (!empty($nameMergeVar) && !empty($name)){
                     if ( is_array($name) ) {
@@ -157,27 +159,37 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                     'merge_vars' => $mergeVars,
                 );
 
-                $callResult = $mailchimp->call('lists/update-member', $request);
+                
+    			$params = array(
+                    'email_address' => $email,
+                    'status_if_new' => 'subscribed',
+                    'email_type' => 'html',
+                    'status' => 'subscribed',
+                    'merge_fields' => $mergeVars
+                );
 
-                if (isset($callResult["status"])) {
+                $callResult = $mailchimp->put('/lists' . '/' . $list . '/members' . '/' . md5($email), $params);
+//                $callResult = $mailchimp->call('lists/update-member', $request);
 
-                    if ((strval($callResult["name"]) == "Email_NotExists") || (strval($callResult["name"]) == "List_NotSubscribed")) {
-
-                        if (!empty($originMergeVar) && !empty($origin))
-                            $mergeVars[$originMergeVar] = $origin;
-
-                        $request = array(
-                            'id' => $list,
-                            'email' => array('email' => $email ),
-                            'double_optin' => 'false',
-                            'send_welcome' => 'false',
-                            'replace_interests' => 'false',
-                            'merge_vars' => $mergeVars
-                        );
-                        
-                        $callResult = $mailchimp->call('lists/subscribe', $request);
-                    }
-                }
+//                if (isset($callResult["status"])) {
+//
+//                    if ((strval($callResult["name"]) == "Email_NotExists") || (strval($callResult["name"]) == "List_NotSubscribed")) {
+//
+//                        if (!empty($originMergeVar) && !empty($origin))
+//                            $mergeVars[$originMergeVar] = $origin;
+//
+//                        $request = array(
+//                            'id' => $list,
+//                            'email' => array('email' => $email ),
+//                            'double_optin' => 'false',
+//                            'send_welcome' => 'false',
+//                            'replace_interests' => 'false',
+//                            'merge_vars' => $mergeVars
+//                        );
+//                        
+//                        $callResult = $mailchimp->call('lists/subscribe', $request);
+//                    }
+//                }
 
             }
         } catch (Exception $e) {
