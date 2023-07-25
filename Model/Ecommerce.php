@@ -40,6 +40,53 @@ class Cammino_Mailchimp_Model_Ecommerce extends Mage_Core_Model_Abstract {
 				$callResultAddQuote = $this->_mailchimp->post('ecommerce/stores/' . $this->_store_id . '/carts', $addQuote);
 				$this->log($callResultAddQuote);
 
+				if(!Mage::getSingleton('customer/session')->isLoggedIn()) {
+					$customer = Mage::getModel("customer/customer")->load($quote->getCustomerId());
+					$subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($customer->getEmail());
+					if ($subscriber->getId()) {
+						$mailchimp  = new MailChimp3(Mage::getStoreConfig("newsletter/mailchimp/token"));
+						$list = Mage::getStoreConfig("newsletter/mailchimp/list_id");				
+						$nameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/name_merge_var");
+						$lastNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/last_name_merge_var");
+						$genderNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/gender_merge_var");
+						$groupNameMergeVar = Mage::getStoreConfig("newsletter/mailchimp/group_name_merge_var");
+						$birthdayMergeVar = Mage::getStoreConfig("newsletter/mailchimp/birthday_merge_var");
+						$mergeVars = array();
+						if (!empty($nameMergeVar)) {
+							$mergeVars[$nameMergeVar]     = $customer->getFirstname();
+						}
+						if (!empty($lastNameMergeVar)) {
+							$mergeVars[$lastNameMergeVar] = $customer->getLastname();
+						}
+						if (!empty($genderNameMergeVar)) {
+							$gender = $customer->getResource()->getAttribute('gender')->getSource()->getOptionText($customer->getData('gender'));
+							if($gender == "masculino" || $gender == "male" || $gender == "homem") {
+								$gender = "M";
+							} elseif($gender == "feminino" || $gender == "female" || $gender == "mulher") {
+								$gender = "F";
+							}
+							$mergeVars[$genderNameMergeVar] = $gender;
+						}
+						if (!empty($groupNameMergeVar)) {					
+							$group = $customer->getGroupId();
+							$mergeVars[$groupNameMergeVar] = Mage::getModel('customer/group')->load($group)->getCustomerGroupCode();;
+						}
+						if (!empty($birthdayMergeVar)) {
+							$mergeVars[$birthdayMergeVar] = $customer->getDob();
+						}
+						$params = array(
+							'email_address' => $customer->getEmail(),
+							'status_if_new' => 'subscribed',
+							'email_type' => 'html',
+							'status' => 'subscribed',
+							'merge_fields' => $mergeVars
+						);
+						Mage::log('PARAMS: ' . json_encode($params, true), null, 'mailchimp_subscriber3.log');
+						$callResult = $mailchimp->put('/lists' . '/' . $list . '/members' . '/' . md5($customer->getEmail()), $params);
+						Mage::log('RESULT: ' . json_encode($callResult, true), null, 'mailchimp_subscriber3.log');
+					}
+				}
+
 				if ($callResultAddQuote['title'] = 'Cart Already Exists') {
 					$updateQuote = array(
 						'checkout_url' => Mage::getUrl('checkout/cart'),

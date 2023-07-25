@@ -168,7 +168,9 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                     'merge_fields' => $mergeVars
                 );
 
+                Mage::log('PARAMS: ' . json_encode($params, true), null, 'mailchimp_subscriber3.log');
                 $callResult = $mailchimp->put('/lists' . '/' . $list . '/members' . '/' . md5($email), $params);
+                Mage::log('RESULT: ' . json_encode($callResult, true), null, 'mailchimp_subscriber3.log');
 //                $callResult = $mailchimp->call('lists/update-member', $request);
 
 //                if (isset($callResult["status"])) {
