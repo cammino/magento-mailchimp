@@ -159,6 +159,9 @@ class Cammino_Mailchimp_Model_Observer_Subscriber extends Varien_Object
                     'merge_vars' => $mergeVars,
                 );
 
+                if (!$mergeVars) {
+                    $mergeVars = json_decode('{}');
+                }
                 
     			$params = array(
                     'email_address' => $email,
